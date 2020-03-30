@@ -88,7 +88,7 @@ def main(date, after_date, case_file, pop_file, county, header, output,
         print(sep.join(data))
 
     if header:
-        print_line(["date"] + list(county))
+        print_line(["date"] + [f'"{c}"' for c in county])
     for d in sorted(cases.keys()):
         fields = [d]
         for c in county:
