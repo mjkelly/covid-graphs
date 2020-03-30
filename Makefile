@@ -1,12 +1,12 @@
 OUTPUT=csv
 
 .PHONY: all
-all: venv venv/install ## Set up environment
+setup: venv venv/install covid-19-data ## Set up environment
 
 .PHONY: ny-la-infections
 ny-la-infections: venv/install ## Output data
 	./venv/bin/python3 extract.py --pop-file population.csv \
-		--case-file ../covid-19-data/us-counties.csv \
+		--case-file ./covid-19-data/us-counties.csv \
 		--after-date 2020-03-13 \
 		--county="New York City" --county="Los Angeles" \
 		--output ${OUTPUT} \
@@ -15,7 +15,7 @@ ny-la-infections: venv/install ## Output data
 .PHONY: ny-la-deaths
 ny-la-deaths: venv/install ## Output data
 	./venv/bin/python3 extract.py --pop-file population.csv \
-		--case-file ../covid-19-data/us-counties.csv \
+		--case-file ./covid-19-data/us-counties.csv \
 		--after-date 2020-03-13 \
 		--county="New York City" --county="Los Angeles" \
 		--output ${OUTPUT} \
@@ -28,9 +28,12 @@ venv/install: venv requirements.txt ## Install packages in venv
 	./venv/bin/pip3 install -r requirements.txt
 	touch venv/install
 
+covid-19-data: ## Clone the New York Times COVID-19 data repo
+	git clone https://github.com/nytimes/covid-19-data.git covid-19-data
+
 .PHONY: clean
 clean: ## Clean up virtualenv
-	rm -rf venv
+	rm -rf venv covid-19-data
 
 .PHONY: help
 help:
