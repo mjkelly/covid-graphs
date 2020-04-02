@@ -16,20 +16,19 @@ Every other step will refer to `../covid-19-data`, which is this data.
 
 Set up the environment like this (you need python3):
 ```
-make
+make setup
 ```
 
-There are some preloaded invocations of `extract.py`:
+To generate graphs of the data, you can run `make pngs`, which will generate a
+few .png files. Each file is just the result of an `extract.py` call that
+creates a .tsv file, and a `gnuplot` (which references `.tsv` file in a `.plot` file).
 
-```
-make ny-la-infections
-```
+If you write more makefile rules to generate .tsv files, and more .plot files
+saying how to graph the data, it should be straightforward to create more
+graphs.
 
-You can set `OUTPUT` to change to tsv (gnuplot-friendly):
+To update existing png images, `make update-pngs`
 
-```
-make ny-la-infections OUTPUT=tsv
-```
 
 ## Caveats
 
