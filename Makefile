@@ -17,16 +17,17 @@ csvs: nyla-i.csv nyla-d.csv
 
 .PHONY: pngs
 pngs: csvs # generate PNG files, matplotlib version
-	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-linear.png --ylabel "Infections per 1000 people"
-	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-log.png --ylabel "Infections per 1000 people" --ylog 
-	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-linear.png --ylabel "Deaths per 1000 people"
-	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-log.png --ylabel "Deaths per 1000 people" --ylog 
+	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-linear.png --title "Infections (linear)" --ylabel "Infections per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-log.png --title "Infections (logarithmic)" --ylabel "Infections per 1000 people" --ylog 
+	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-linear.png --title "Deaths (linear)" --ylabel "Deaths per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-log.png --title "Deaths (logarithmic)" --ylabel "Deaths per 1000 people" --ylog 
 
 
 .PHONY: report
 report: pngs
-	cp *.png report.html ${REPORT_DIR}
-	echo "<hr>Generated: $$(date)" >> ${REPORT_DIR}/report.html
+	cp *.png ${REPORT_DIR}/
+	cp report.html ${REPORT_DIR}/index.html
+	echo "<hr>Generated: $$(date)" >> ${REPORT_DIR}/index.html
 
 .PHONY: ny-la
 ny-la: setup ## Output data for NY and LA

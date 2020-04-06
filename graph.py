@@ -33,13 +33,15 @@ def get_data(pop_file):
 @click.command()
 @click.option("--infile", type=str, help="Input CSV file", required=True)
 @click.option("--outfile", type=str, help="Input PNG file", required=True)
+@click.option("--title", type=str, help="Title of graph", default=None)
 @click.option("--ylabel", type=str, help="Y label for graph", required=True)
 @click.option("--ylog", type=str, is_flag=True, help="Make Y axis log scale")
-def main(infile, outfile, ylabel, ylog):
+def main(infile, outfile, title, ylabel, ylog):
     data = get_data(infile)
     formatter = matplotlib.dates.DateFormatter("%m/%d")
     loc = matplotlib.dates.DayLocator()
-    fig, ax = plt.subplots()
+    size_mult = 1.5
+    fig, ax = plt.subplots(figsize=[6.4*size_mult, 4.8*size_mult])
 
     if ylog:
         plt.yscale("log")
@@ -55,9 +57,11 @@ def main(infile, outfile, ylabel, ylog):
     ax.grid(True)
     ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.legend(loc="upper left")
+    if title is not None:
+        ax.set_title(title, fontweight="bold", pad=20)
     ax.xaxis.set_major_locator(loc)
     ax.xaxis.set_major_formatter(formatter)
-    ax.xaxis.set_tick_params(rotation=45, labelsize=10)
+    ax.xaxis.set_tick_params(rotation=45, labelsize=8)
     ax.set_ylabel(ylabel)
     plt.savefig(outfile)
 
