@@ -1,4 +1,8 @@
 #!/bin/bash
+PATH="$PATH:$HOME/bin"
+exec 1> >(logger -s -t $(basename $0)) 2>&1
+echo "Beginning covid-graph run"
+
 set -u
 set -e
 cfg=$HOME/.aws/config
@@ -6,9 +10,6 @@ profile=mkorg-scratch
 bucket=s3://scratch.michaelkelly.org/covid-report
 dir=covid-report
 scripts=$(dirname $0)
-
-exec 1> >(logger -s -t $(basename $0)) 2>&1
-echo "Beginning covid-graph run"
 
 which aws || (echo "'aws' command not found. Aborting."; exit 2)
 [ -f $cfg ] || (echo "Config file $cfg does not exist. Aborting."; exit 2)

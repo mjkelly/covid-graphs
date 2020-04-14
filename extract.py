@@ -75,8 +75,13 @@ def get_cases(case_file, start_date, case_type):
     default="infections",
     type=click.Choice(["infections", "deaths"]),
     help="Type of case to track")
+@click.option(
+    "--metric",
+    default="total",
+    type=click.Choice(["total", "total_per_1k", "daily", "daily_per_1k"]),
+    help="Type of metric to output")
 def main(date, after_date, case_file, pop_file, county, header, output,
-         case_type):
+         case_type, metric):
     pop = get_populations(pop_file)
     cases = get_cases(case_file, after_date, case_type)
     if output == "csv":
@@ -89,15 +94,39 @@ def main(date, after_date, case_file, pop_file, county, header, output,
 
     if header:
         print_line(["date"] + [f'"{c}"' for c in county])
+    per_county = {}
     for d in sorted(cases.keys()):
         fields = [d]
+        # We can decide to skip outputting this day if we don't have data
+        print_this_day = True
         for c in county:
             if c in cases[d]:
-                cases_per_1000 = cases[d][c] / (pop[c] / 1000)
-                fields.append("%.6f" % cases_per_1000)
+                if metric == "total":
+                    output = cases[d][c]
+                    fields.append("%.6f" % output)
+                elif metric == "total_per_1k":
+                    output = cases[d][c] / (pop[c] / 1000)
+                    fields.append("%.6f" % output)
+                elif metric == "daily":
+                    if c in per_county:
+                        # We have a previous day's data
+                        output = cases[d][c] - per_county[c]
+                        fields.append("%.6f" % output)
+                    else:
+                        print_this_day = False
+                    per_county[c] = cases[d][c]
+                elif metric == "daily_per_1k":
+                    if c in per_county:
+                        # We have a previous day's data
+                        output = (cases[d][c] - per_county[c]) / (pop[c] / 1000)
+                        fields.append("%.6f" % output)
+                    else:
+                        print_this_day = False
+                    per_county[c] = cases[d][c]
             else:
                 print(f"Warning: Couldn't find {d}/{c} in case data")
-        print_line(fields)
+        if print_this_day:
+            print_line(fields)
 
 
 if __name__ == "__main__":

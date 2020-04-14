@@ -1,5 +1,6 @@
 OUTPUT := csv
 TYPE := infections
+METRIC := total
 REPORT_DIR := ~/public_html/covid/
 
 .PHONY: setup
@@ -11,16 +12,26 @@ nyla-i.csv: venv/install ## Output data
 nyla-d.csv: venv/install ## Output data
 	make --quiet ny-la OUTPUT=csv TYPE=deaths > $@.tmp
 	mv $@.tmp $@
+nyla-idaily.csv: venv/install ## Output data
+	make --quiet ny-la OUTPUT=csv TYPE=infections METRIC=daily_per_1k > $@.tmp
+	mv $@.tmp $@
+nyla-ddaily.csv: venv/install ## Output data
+	make --quiet ny-la OUTPUT=csv TYPE=deaths METRIC=daily_per_1k > $@.tmp
+	mv $@.tmp $@
 
 .PHONY: csvs
-csvs: nyla-i.csv nyla-d.csv
+csvs: nyla-i.csv nyla-d.csv nyla-idaily.csv nyla-ddaily.csv
 
 .PHONY: pngs
 pngs: csvs # generate PNG files, matplotlib version
-	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-linear.png --title "Infections (linear)" --ylabel "Infections per 1000 people"
-	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-log.png --title "Infections (logarithmic)" --ylabel "Infections per 1000 people" --ylog 
-	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-linear.png --title "Deaths (linear)" --ylabel "Deaths per 1000 people"
-	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-log.png --title "Deaths (logarithmic)" --ylabel "Deaths per 1000 people" --ylog 
+	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-linear.png --title "Cumulative Infections (linear)" --ylabel "Infections per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-i.csv --outfile nyla-i-log.png --title "Cumulative Infections (logarithmic)" --ylabel "Infections per 1000 people" --ylog 
+	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-linear.png --title "Cumulative Deaths (linear)" --ylabel "Deaths per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-d.csv --outfile nyla-d-log.png --title "Cumulative Deaths (logarithmic)" --ylabel "Deaths per 1000 people" --ylog 
+	./venv/bin/python3 graph.py --infile nyla-idaily.csv --outfile nyla-idaily-linear.png --title "Infections per Day (linear)" --ylabel "Infections per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-idaily.csv --outfile nyla-idaily-log.png --title "Infections per Day (logarithmic)" --ylabel "Infections per 1000 people" --ylog
+	./venv/bin/python3 graph.py --infile nyla-ddaily.csv --outfile nyla-ddaily-linear.png --title "Deaths per Day (linear)" --ylabel "Infections per 1000 people"
+	./venv/bin/python3 graph.py --infile nyla-ddaily.csv --outfile nyla-ddaily-log.png --title "Deaths per Day (logarithmic)" --ylabel "Infections per 1000 people" --ylog
 
 
 .PHONY: report
@@ -36,7 +47,8 @@ ny-la: setup ## Output data for NY and LA
 		--after-date 2020-03-13 \
 		--county="New York City" --county="Los Angeles" \
 		--output ${OUTPUT} \
-		--case-type ${TYPE}
+		--case-type ${TYPE} \
+	  --metric ${METRIC}
 
 venv: ## Set up virtualenv
 	python3 -m venv venv
