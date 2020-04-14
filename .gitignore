@@ -1,2 +1,5 @@
 venv
 covid-19-data
+*.png
+*.csv
+*.tsv
