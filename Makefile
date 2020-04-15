@@ -69,7 +69,7 @@ update-pngs: clean covid-19-data-update pngs
 
 .PHONY: clean
 clean: ## Clean up output
-	rm -f nyla-i.* nyla-d.* nyla-*.png
+	rm -f nyla-*.csv nyla-*.tsv nyla-*.png
 
 .PHONY: clean-all
 clean-all: clean ## Clean up everything (virtualenv, downloaded data)
