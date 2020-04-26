@@ -38,6 +38,7 @@ pngs: graph.py csvs ## generate PNG files with matplotlib
 report: pngs ## Generate a full report
 	cp *.png ${REPORT_DIR}/
 	cp report.html ${REPORT_DIR}/index.html
+	cp coronavirus.png ${REPORT_DIR}
 	echo "<hr>Generated: $$(date)" >> ${REPORT_DIR}/index.html
 
 .PHONY: ny-la
