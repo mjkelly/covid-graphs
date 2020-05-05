@@ -62,6 +62,8 @@ def main(infile, outfile, title, ylabel, ylog):
     ax.xaxis.set_major_locator(loc)
     ax.xaxis.set_major_formatter(formatter)
     ax.xaxis.set_tick_params(rotation=45, labelsize=8)
+    for label in ax.xaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
     ax.set_ylabel(ylabel)
     plt.savefig(outfile)
 
