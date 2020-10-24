@@ -1,4 +1,4 @@
-REPORT_DIR := ~/public_html/covid/
+REPORT_DIR := report
 
 .PHONY: setup
 setup: venv venv/install covid-19-data ## Set up environment
