@@ -8,6 +8,7 @@ import subprocess
 import os
 import sys
 
+
 def update_data(data_dir):
     print(f"Updating data in {data_dir}...")
     oldcwd = os.getcwd()
@@ -15,7 +16,8 @@ def update_data(data_dir):
     print(subprocess.check_output(["git", "pull"]))
     os.chdir(oldcwd)
 
-def show_graphs(data, title, logy, avg_days, output_prefix='out'):    
+
+def show_graphs(data, title, logy, avg_days, output_prefix='out'):
     figsize = (14, 8)
     if avg_days > 1:
         data = data.copy().rolling(window=avg_days).mean()
@@ -24,28 +26,53 @@ def show_graphs(data, title, logy, avg_days, output_prefix='out'):
     maybe_avg_note = f", {avg_days}-day rolling avg" if avg_days > 1 else ""
     full_title_per_day = f"{title} per day ({scale_note}{maybe_avg_note})"
     full_title_cum = f"{title} cumulative ({scale_note}{maybe_avg_note})"
-    
-    plot = data.diff().plot(figsize=figsize, rot=45, grid=True, logy=logy, title=full_title_per_day)
-    plot_cum = data.plot(figsize=figsize, rot=45, grid=True, logy=logy, title=full_title_cum)
-    
+
+    plot = data.diff().plot(figsize=figsize,
+                            rot=45,
+                            grid=True,
+                            logy=logy,
+                            title=full_title_per_day)
+    plot_cum = data.plot(figsize=figsize,
+                         rot=45,
+                         grid=True,
+                         logy=logy,
+                         title=full_title_cum)
+
     plot.get_figure().savefig(output_prefix + ".png")
     plot_cum.get_figure().savefig(output_prefix + "_cum.png")
+
 
 def write_html(template, report_dir):
     now = datetime.datetime.now()
     file_path = os.path.join(report_dir, 'index.html')
     with open(template, 'r') as fh:
         template = jinja2.Template(fh.read())
-    
+
     with open(file_path, 'w') as fh:
         fh.write(template.render(time=now))
 
+
 @click.command()
-@click.option("--data-dir", type=str, help="Git checkout for data", default='covid-19-data')
-@click.option("--data-file", type=str, help="Input CSV file", default='us-counties.csv')
-@click.option("--report-dir", type=str, help="Where to write report", default='report')
-@click.option("--template-file", type=str, help="template to use", default='report.tmpl')
-@click.option("--debug-days", type=int, help="Show this many days of debug data", default=0)
+@click.option("--data-dir",
+              type=str,
+              help="Git checkout for data",
+              default='covid-19-data')
+@click.option("--data-file",
+              type=str,
+              help="Input CSV file",
+              default='us-counties.csv')
+@click.option("--report-dir",
+              type=str,
+              help="Where to write report",
+              default='report')
+@click.option("--template-file",
+              type=str,
+              help="template to use",
+              default='report.tmpl')
+@click.option("--debug-days",
+              type=int,
+              help="Show this many days of debug data",
+              default=0)
 def render(data_dir, data_file, report_dir, template_file, debug_days):
     full_data_file = os.path.join(data_dir, data_file)
     # === update data from git ===
@@ -59,8 +86,8 @@ def render(data_dir, data_file, report_dir, template_file, debug_days):
         # all populations based on Wikipedia 2020 estimates
         ('New York City, New York', 8398748),
         ('Los Angeles, California', 10105518),
-        ('Cook, Illinois', 5150233), # Chicago
-        ('King, Washington', 753675), # Seattle
+        ('Cook, Illinois', 5150233),  # Chicago
+        ('King, Washington', 753675),  # Seattle
         ('San Francisco, California', 881549),
         ('San Diego, California', 3338330),
     ]
@@ -95,10 +122,26 @@ def render(data_dir, data_file, report_dir, template_file, debug_days):
 
     if not os.path.isdir(report_dir):
         os.mkdir(report_dir)
-    show_graphs(cases_tot_df, "Cases total", False, 5, output_prefix=os.path.join(report_dir, 'cases_total'))
-    show_graphs(cases_by_pop_df, "Cases per 1000 pop", False, 5, output_prefix=os.path.join(report_dir, 'cases_by_pop'))
-    show_graphs(deaths_tot_df, "Deaths total", False, 5, output_prefix=os.path.join(report_dir, 'deaths_total'))
-    show_graphs(deaths_by_pop_df, "Deaths per 1000 people", False, 5, output_prefix=os.path.join(report_dir, 'deaths_by_pop'))
+    show_graphs(cases_tot_df,
+                "Cases total",
+                False,
+                5,
+                output_prefix=os.path.join(report_dir, 'cases_total'))
+    show_graphs(cases_by_pop_df,
+                "Cases per 1000 pop",
+                False,
+                5,
+                output_prefix=os.path.join(report_dir, 'cases_by_pop'))
+    show_graphs(deaths_tot_df,
+                "Deaths total",
+                False,
+                5,
+                output_prefix=os.path.join(report_dir, 'deaths_total'))
+    show_graphs(deaths_by_pop_df,
+                "Deaths per 1000 people",
+                False,
+                5,
+                output_prefix=os.path.join(report_dir, 'deaths_by_pop'))
 
     write_html(template_file, report_dir)
 
