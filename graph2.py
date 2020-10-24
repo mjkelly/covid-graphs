@@ -41,7 +41,7 @@ def write_html(template, report_dir):
         fh.write(template.render(time=now))
 
 @click.command()
-@click.option("--data-dir", type=str, help="Git checkout for data", default=os.path.join(os.getenv('HOME'), 'git', 'covid-19-data'))
+@click.option("--data-dir", type=str, help="Git checkout for data", default='covid-19-data')
 @click.option("--data-file", type=str, help="Input CSV file", default='us-counties.csv')
 @click.option("--report-dir", type=str, help="Where to write report", default='report')
 @click.option("--template-file", type=str, help="template to use", default='report.tmpl')
