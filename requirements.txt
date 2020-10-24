@@ -1,2 +1,4 @@
 click
 matplotlib
+pandas
+jinja2
