@@ -9,6 +9,7 @@ import subprocess
 import os
 import sys
 
+
 def update_data(url, out_path):
     print(f"Downloading {url} to {out_path}...")
     out_dir = os.path.dirname(out_path)
@@ -17,6 +18,7 @@ def update_data(url, out_path):
     req.urlretrieve(url, out_path)
     out_size = os.stat(out_path).st_size
     print(f"Downloaded {out_size} bytes")
+
 
 def update_git_data(data_dir):
     print(f"Updating data in {data_dir}...")
@@ -90,7 +92,8 @@ def write_html(template, report_dir):
               type=int,
               help="Show this many days of debug data",
               default=0)
-def render(download_url, data_dir, data_file, report_dir, template_file, days, debug_days):
+def render(download_url, data_dir, data_file, report_dir, template_file, days,
+           debug_days):
     full_data_file = os.path.join(data_dir, data_file)
     # === update data from git ===
     if download_url:
