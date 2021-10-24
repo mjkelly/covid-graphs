@@ -1,3 +1,5 @@
 venv
 covid-19-data
+# default report dir, and the one used by sync.sh
 report
+covid-report
