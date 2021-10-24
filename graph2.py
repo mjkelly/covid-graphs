@@ -3,13 +3,22 @@ import matplotlib.pyplot as plt
 import click
 import jinja2
 
+import urllib.request as req
 import datetime
 import subprocess
 import os
 import sys
 
+def update_data(url, out_path):
+    print(f"Downloading {url} to {out_path}...")
+    out_dir = os.path.dirname(out_path)
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+    req.urlretrieve(url, out_path)
+    out_size = os.stat(out_path).st_size
+    print(f"Downloaded {out_size} bytes")
 
-def update_data(data_dir):
+def update_git_data(data_dir):
     print(f"Updating data in {data_dir}...")
     oldcwd = os.getcwd()
     os.chdir(data_dir)
@@ -53,6 +62,10 @@ def write_html(template, report_dir):
 
 
 @click.command()
+@click.option("--download-url",
+              type=str,
+              help="If specified, download the given URL intead of using git",
+              default=None)
 @click.option("--data-dir",
               type=str,
               help="Git checkout for data",
@@ -69,14 +82,21 @@ def write_html(template, report_dir):
               type=str,
               help="template to use",
               default='report.tmpl')
+@click.option("--days",
+              type=int,
+              help="If nonzero, show this many days. If zero, show all data.",
+              default=0)
 @click.option("--debug-days",
               type=int,
               help="Show this many days of debug data",
               default=0)
-def render(data_dir, data_file, report_dir, template_file, debug_days):
+def render(download_url, data_dir, data_file, report_dir, template_file, days, debug_days):
     full_data_file = os.path.join(data_dir, data_file)
     # === update data from git ===
-    update_data(data_dir)
+    if download_url:
+        update_data(download_url, os.path.join(data_dir, data_file))
+    else:
+        update_git_data(data_dir)
 
     # === read data ===
     d = pd.read_csv(full_data_file)
@@ -119,6 +139,12 @@ def render(data_dir, data_file, report_dir, template_file, debug_days):
         print(deaths_by_pop_df.tail(debug_days))
         print(f"deaths per 1000 people (last {debug_days}):")
         print(deaths_by_pop_df.tail(debug_days))
+
+    if days > 0:
+        cases_tot_df = cases_tot_df.tail(days)
+        deaths_tot_df = deaths_tot_df.tail(days)
+        cases_by_pop_df = cases_by_pop_df.tail(days)
+        deaths_by_pop_df = deaths_by_pop_df.tail(days)
 
     if not os.path.isdir(report_dir):
         os.mkdir(report_dir)
